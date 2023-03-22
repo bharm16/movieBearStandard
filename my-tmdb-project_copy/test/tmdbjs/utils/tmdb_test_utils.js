@@ -1,21 +1,16 @@
 const fs = require('fs').promises;
-
 const path = require('path');
 
 const getCredentialsPath = () => {
-    return path.resolve(__dirname, '..', 'src', 'credentials.json');
+    const credentialsDirectory = "/Users/bryceharmon/Desktop/movieBearStandard/my-tmdb-project_copy/src/";
+    return path.join(credentialsDirectory, 'credentials.json');
 };
-
-module.exports = {
-    getCredentialsPath,
-};
-
 
 /**
  * Gets the API key from the file system.
  * @returns {Promise<string>} A Promise of an API key as a string.
  */
-exports.getApiKeyAsync = async () => {
+module.exports.getApiKeyAsync = async () => {
     if (process.env.TMDB_API_V3_KEY) {
         // If the TMDb API key can be found among the secrets, use it
         return process.env.TMDB_API_V3_KEY;
@@ -25,7 +20,6 @@ exports.getApiKeyAsync = async () => {
         return credentials["tmdb_api_v3_key"];
     }
 }
-
 /**
  * Gets login information.
  * @returns {Promise<{password: string, username: string}>}
@@ -61,6 +55,15 @@ exports.getSessionIdAsync = async () => {
  * @returns {Promise<*>} A Promise of credential data in JSON format.
  */
 getCredentialsJsonAsync = async () => {
-    let credentials = await fs.readFile('././credentials.json');
+    let credentialsPath = getCredentialsPath();
+    let credentials = await fs.readFile(credentialsPath);
     return JSON.parse(credentials.toString());
 }
+
+
+module.exports = {
+    getCredentialsPath,
+    getApiKeyAsync: module.exports.getApiKeyAsync,
+    getLoginInformationAsync: exports.getLoginInformationAsync,
+    getSessionIdAsync: exports.getSessionIdAsync,
+};
