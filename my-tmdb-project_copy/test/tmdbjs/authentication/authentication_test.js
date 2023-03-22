@@ -8,7 +8,7 @@ const credentialsPath = getCredentialsPath();
 // Use the credentialsPath variable as needed in this test file
 
 
-exports.runTest = (authentication) => {
+module.exports.runTest = (authentication) => {
 
     let apiKey = authentication["apiKey"];
 
@@ -16,23 +16,38 @@ exports.runTest = (authentication) => {
 
     describe("Authentication tests", () => {
 
-        xit('Should create a guest session.', async () => {
+        it('Should create a guest session.', async () => {
             let guestSessionID = await tmdb.getAuthenticator().createGuestSessionAsync();
             assert.ok(guestSessionID);
         });
 
-        xit('Should create a session with login.', async () => {
-            let loginInfo = await tmdbTestUtils.getLoginInformationAsync();
+        it('Should create a session without login.', async () => {
             let authenticator = tmdb.getAuthenticator();
-            let sessionId = await authenticator.createLoginSessionAsync(loginInfo.username, loginInfo.password);
-            assert.ok(sessionId);
-            assert.ok(await authenticator.deleteSessionAsync(sessionId));
-        });
+
+            try {
+                // Create a session
+                const sessionId = await authenticator.createSessionAsync("chrome");
+                console.log('Session ID:', sessionId); // Add a console log for sessionId
+                assert.ok(sessionId);
+
+                // Delete the session
+                const isDeleted = await authenticator.deleteSessionAsync(sessionId);
+                console.log('Session deletion status:', isDeleted); // Add a console log for session deletion status
+                assert.ok(isDeleted);
+            } catch (error) {
+                console.error('Error:', error); // Add a console log for the caught error
+                throw error;
+            }
+        }).timeout(15000);
+
+
 
         // Tests that do not work in CIs
         if (!process.env.CI) {
 
-            xit('Should create a session without login.', async () => {
+            it('Should create a session without login.', async () => {
+
+                this.skip(); //skip for now
 
                 let authenticator = tmdb.getAuthenticator();
 

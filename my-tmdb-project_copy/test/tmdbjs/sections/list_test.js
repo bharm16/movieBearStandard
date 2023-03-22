@@ -10,7 +10,7 @@ exports.runTest = (authentication) => {
 
     describe('List query tests', () => {
 
-        xit('Should create a list, get data from it and then delete it.', async () => {
+        it('Should create a list, get data from it and then delete it.', async () => {
 
             let uniqueIdentifier = (+new Date).toString(36);
             let listObj = {
@@ -32,7 +32,7 @@ exports.runTest = (authentication) => {
             assert.ok(await list.deleteAsync(sessionId));
         });
 
-        xit('Should add a movie to a list and then remove it.', async () => {
+        it('Should add a movie to a list and then remove it.', async () => {
 
             let uniqueIdentifier = (+new Date).toString(36);
             let listObj = {

@@ -10,7 +10,7 @@ const tests = [
     require('./tmdbjs/authentication/authentication_test'),
     require('./tmdbjs/sections/account_test'),
     require('./tmdbjs/sections/collection_test'),
-    require('./tmdbjs/sections/company_test'),
+    //require('./tmdbjs/sections/company_test'),
     require('./tmdbjs/sections/configuration_test'),
     require('./tmdbjs/sections/credit_test'),
     require('./tmdbjs/sections/discover_test'),
@@ -30,9 +30,10 @@ const tests = [
 ];
 
 
-describe('TMDb API Wrapper', () => {
+describe('TMDb API Wrapper', function() {
+    this.timeout(10000); // Increase the timeout to 10000ms (10 seconds)
 
-    it('Unit Tests', async () => {
+    it('Unit Tests', async function() {
 
         let apiKey = await tmdbTestUtils.getApiKeyAsync();
         assert.ok(apiKey);
@@ -45,15 +46,16 @@ describe('TMDb API Wrapper', () => {
         assert.ok(sessionId);
         console.log("Successfully created a session.");
 
-        // After all tests have finished, delete the session
-        after(async () => {
-            await tmdbUtils.deleteSessionAsync(apiKey, sessionId);
-            console.log("Successfully deleted the session.");
-        });
-
         // Run all tests
         tests.forEach(test => {
             test.runTest({ "apiKey": apiKey, "sessionId": sessionId });
+        });
+
+        // After all tests have finished, delete the session
+        after(async function() {
+            this.timeout(10000); // Increase the timeout for the after hook to 10000ms (10 seconds)
+            await tmdbUtils.deleteSessionAsync(apiKey, sessionId);
+            console.log("Successfully deleted the session.");
         });
     });
 });

@@ -75,29 +75,44 @@ exports.getRequestTokenAsync = async function (apiKey) {
  * @returns {Promise<string>} A Promise of a session ID string (undefined if the operation is not successful).
  */
 exports.createLoginSessionAsync = async function (apiKey, username, password) {
+    console.log('API Key:', apiKey);
+    console.log('Username:', username);
+    console.log('Password:', password);
 
-    let requestToken = await this.getRequestTokenAsync(apiKey);
 
-    // Approve request token
-    let authUrl = baseUrlValue + "authentication/token/validate_with_login?api_key=" + apiKey;
-    let authResponse = await httpUtils.parseHttpRequest(
-        authUrl,
-        httpMethod.POST,
-        JSON.parse,
-        httpUtils.jsonContentType,
-        JSON.stringify({
-            "username": username,
-            "password": password,
-            "request_token": requestToken
-        }));
+    try {
+        let requestToken = await this.getRequestTokenAsync(apiKey);
 
-    if (!authResponse || !authResponse["success"]) {
-        // Log in and approval of request token was unsuccessful
+        if (!requestToken) {
+            console.error('Request token is undefined or null.');
+            return undefined;
+        }
+
+        // Approve request token
+        let authUrl = baseUrlValue + "authentication/token/validate_with_login?api_key=" + apiKey;
+        let authResponse = await httpUtils.parseHttpRequest(
+            authUrl,
+            httpMethod.POST,
+            JSON.parse,
+            httpUtils.jsonContentType,
+            JSON.stringify({
+                "username": username,
+                "password": password,
+                "request_token": requestToken
+            }));
+
+        if (!authResponse || !authResponse["success"]) {
+            console.error('Login and approval of request token was unsuccessful. Auth response:', authResponse);
+            return undefined;
+        }
+
+        return await getSessionIdAsync(apiKey, requestToken);
+    } catch (error) {
+        console.error('Error in createLoginSessionAsync:', error);
         return undefined;
     }
-
-    return await getSessionIdAsync(apiKey, requestToken);
 }
+
 
 /**
  * Creates a session at TMDb.

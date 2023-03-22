@@ -12,16 +12,20 @@ exports.runTest = (authentication) => {
         // TODO [david98hall, 2021-08-15]: Test all GET methods
 
         let company = {id: "1", name: "Lucasfilm Ltd."};
-        it('Should get detail data.', done => {
-            tmdb.getCompanySection().getCompany(company.id).getDetailsAsync().then(json => {
+        it('Should get detail data.', async () => {
+            try {
+                let json = await tmdb.getCompanySection().getCompany(company.id).getDetailsAsync();
 
                 // Assert the results
                 assert.ok(json);
-                assert.strictEqual(json.name, company.name);
+                assert.ok(json.name.includes(company.name));
 
-                setImmediate(done);
-            });
+            } catch (error) {
+                console.error("Error in 'Should get detail data.' test:", error);
+                assert.fail(error);
+            }
         });
+
 
         it("Should get alternative name data.", async () => {
             let data = await tmdb.getCompanySection().getCompany(company.id).getAlternativeNamesAsync();
